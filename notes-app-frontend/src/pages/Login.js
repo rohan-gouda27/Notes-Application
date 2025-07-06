@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import API from '../services/api';
+import { authAPI } from '../services/api';
 
 const Login = () => {
   const [form, setForm] = useState({ username: '', password: '' });
@@ -18,8 +18,9 @@ const Login = () => {
     }
 
     try {
-      const res = await API.post('/auth/login', form);
+      const res = await authAPI.login(form);
       localStorage.setItem('token', res.data.token);
+      localStorage.setItem('user', JSON.stringify(res.data.user));
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
@@ -28,8 +29,8 @@ const Login = () => {
 
   return (
     <div className="auth-container">
-      <h2>Login</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <h2>Welcome To Notes App</h2>
+      {error && <div className="error-message">{error}</div>}
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -37,18 +38,18 @@ const Login = () => {
           placeholder="Username"
           value={form.username}
           onChange={handleChange}
-        /><br />
+        />
         <input
           type="password"
           name="password"
           placeholder="Password"
           value={form.password}
           onChange={handleChange}
-        /><br />
+        />
         <button type="submit">Login</button>
       </form>
 
-      <p style={{ marginTop: '10px' }}>
+      <p style={{ marginTop: '20px' }}>
         Don't have an account? <Link to="/register">Register here</Link>
       </p>
     </div>

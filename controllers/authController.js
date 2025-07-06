@@ -12,8 +12,8 @@ exports.register = async (req, res) => {
     const hashed = await bcrypt.hash(password, 10);
 
     db.query(
-      'INSERT INTO users (username, password) VALUES (?, ?)',
-      [username, hashed],
+      'INSERT INTO users (username, password, role) VALUES (?, ?, ?)',
+      [username, hashed, 'user'],
       (err, result) => {
         if (err) {
           if (err.code === 'ER_DUP_ENTRY') {
@@ -45,11 +45,23 @@ exports.login = async (req, res) => {
 
       if (!match) return res.status(401).json({ message: 'Invalid credentials' });
 
-      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      const token = jwt.sign({ 
+        id: user.id, 
+        username: user.username,
+        role: user.role 
+      }, process.env.JWT_SECRET, {
         expiresIn: '1h',
       });
 
-      return res.status(200).json({ message: 'Login successful', token });
+      return res.status(200).json({ 
+        message: 'Login successful', 
+        token,
+        user: {
+          id: user.id,
+          username: user.username,
+          role: user.role
+        }
+      });
     }
   );
 };

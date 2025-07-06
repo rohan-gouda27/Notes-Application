@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import API from '../services/api';
+import { useNavigate, Link } from 'react-router-dom';
+import { authAPI } from '../services/api';
 
 const Register = () => {
   const [form, setForm] = useState({ username: '', password: '' });
@@ -18,7 +18,7 @@ const Register = () => {
     }
 
     try {
-      await API.post('/auth/register', form);
+      await authAPI.register(form);
       navigate('/login');
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
@@ -27,8 +27,8 @@ const Register = () => {
 
   return (
     <div className="auth-container">
-      <h2>Register</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <h2> Create Account</h2>
+      {error && <div className="error-message">{error}</div>}
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -36,16 +36,20 @@ const Register = () => {
           placeholder="Username"
           value={form.username}
           onChange={handleChange}
-        /><br />
+        />
         <input
           type="password"
           name="password"
           placeholder="Password"
           value={form.password}
           onChange={handleChange}
-        /><br />
+        />
         <button type="submit">Register</button>
       </form>
+      
+      <p style={{ marginTop: '20px' }}>
+        Already have an account? <Link to="/login">Login here</Link>
+      </p>
     </div>
   );
 };

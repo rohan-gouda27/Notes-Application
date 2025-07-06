@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import API from '../services/api';
+import { notesAPI } from '../services/api';
 
 const Dashboard = () => {
   const [notes, setNotes] = useState([]);
@@ -11,11 +11,12 @@ const Dashboard = () => {
 
   const fetchNotes = async () => {
     try {
-      const res = await API.get('/notes');
+      const res = await notesAPI.getNotes();
       setNotes(res.data);
     } catch (err) {
-      if (err.response.status === 401 || err.response.status === 403) {
+      if (err.response?.status === 401 || err.response?.status === 403) {
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
         navigate('/login');
       }
     }
@@ -29,7 +30,7 @@ const Dashboard = () => {
     e.preventDefault();
     if (!newNote.title || !newNote.content) return;
     try {
-      await API.post('/notes', newNote);
+      await notesAPI.createNote(newNote);
       setNewNote({ title: '', content: '' });
       fetchNotes();
     } catch (err) {
@@ -45,7 +46,7 @@ const Dashboard = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await API.put(`/notes/${editingNoteId}`, newNote);
+      await notesAPI.updateNote(editingNoteId, newNote);
       setEditingNoteId(null);
       setNewNote({ title: '', content: '' });
       fetchNotes();
@@ -57,7 +58,7 @@ const Dashboard = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this note?')) return;
     try {
-      await API.delete(`/notes/${id}`);
+      await notesAPI.deleteNote(id);
       fetchNotes();
     } catch (err) {
       alert('Failed to delete note');
@@ -66,6 +67,7 @@ const Dashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     navigate('/login');
   };
 
@@ -76,52 +78,79 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      <h2>My Notes</h2>
-      <button onClick={handleLogout}>Logout</button>
+      <div className="dashboard-header">
+        <h2>My Notes</h2>
+        <button className="logout-btn" onClick={handleLogout}>Logout</button>
+      </div>
 
-      <input
-        type="text"
-        placeholder="Search by title or date..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        style={{ marginTop: 10, width: '60%' }}
-      />
-
-      <form onSubmit={editingNoteId ? handleUpdate : handleCreate} style={{ marginTop: 20 }}>
+      <div className="search-section">
         <input
           type="text"
-          placeholder="Title"
-          value={newNote.title}
-          onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
-        /><br />
-        <textarea
-          rows="5"
-          placeholder="Content"
-          value={newNote.content}
-          onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
-        /><br />
-        <button type="submit">{editingNoteId ? 'Update Note' : 'Add Note'}</button>
-      </form>
+          className="search-input"
+          placeholder="Search by title or date..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
 
-      <hr />
+      <div className="note-form">
+        <h3>{editingNoteId ? ' Edit Note' : ' Create New Note'}</h3>
+        <form onSubmit={editingNoteId ? handleUpdate : handleCreate}>
+          <div className="form-row">
+            <input
+              type="text"
+              placeholder="Title"
+              value={newNote.title}
+              onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
+            />
+          </div>
+          <div className="form-row">
+            <textarea
+              rows="5"
+              placeholder="Content"
+              value={newNote.content}
+              onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
+            />
+          </div>
+          <div className="note-actions">
+            <button type="submit">{editingNoteId ? 'Update Note' : 'Add Note'}</button>
+            {editingNoteId && (
+              <button 
+                type="button" 
+                className="cancel-btn"
+                onClick={() => {
+                  setEditingNoteId(null);
+                  setNewNote({ title: '', content: '' });
+                }}
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
 
       {filteredNotes.length > 0 ? (
         filteredNotes.map((note) => (
-          <div key={note.id} style={{ border: '1px solid #ccc', padding: '10px', margin: '10px 0' }}>
+          <div key={note.id} className="note-card">
             <h3>{note.title}</h3>
-            <p>{note.content}</p>
-            <small>Last Updated: {new Date(note.updated_at).toLocaleString()}</small>
-<div style={{ marginTop: '8px' }}>
-  <button onClick={() => handleEdit(note)}>Edit</button>
-  <button onClick={() => handleDelete(note.id)} style={{ marginLeft: '10px' }}>
-    Delete
-  </button>
-</div>
-
+            <div className="note-content">{note.content}</div>
+            <div className="note-meta">
+              <p><strong> Last Updated:</strong> {new Date(note.updated_at).toLocaleString()}</p>
+            </div>
+            <div className="note-actions">
+              <button className="edit-btn" onClick={() => handleEdit(note)}>Edit</button>
+              <button className="delete-btn" onClick={() => handleDelete(note.id)}>
+                Delete
+              </button>
+            </div>
           </div>
         ))
       ) : (
-        <p>No notes found.</p>
+        <div className="empty-state">
+          <h3> No Notes Found</h3>
+          <p>Create your first note to get started!</p>
+        </div>
       )}
     </div>
   );
