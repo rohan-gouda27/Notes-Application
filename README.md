@@ -1,6 +1,52 @@
-# Notes App Backend
+### SCREENSHOT 
+<img width="1889" height="898" alt="image" src="https://github.com/user-attachments/assets/81388198-5bed-439d-9ad9-971a7461dddc" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/18b4403b-8b34-41cd-8136-b4f3d16d676e" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/0d57a6cd-4608-453f-955d-f6d1686e2de4" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/cfc9232e-0695-46f6-b9f5-18ff3102bb0e" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/577eeba9-d489-4fdd-ab70-22ea7a8d225e" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/65390023-5dca-4304-b749-c7698641bea7" />
 
-This is the backend for a simple notes application. It provides user authentication and CRUD (Create, Read, Update, Delete) operations for notes.
+
+# Notes Application Features
+
+## User Features
+
+A standard user has access to a personal dashboard to manage their own notes.
+
+### 1. Authentication
+- **Register:** New users can create an account.
+- **Login:** Securely log in to access their personal dashboard.
+- **Logout:** End their session and log out from the application.
+
+### 2. Note Management (CRUD)
+- **Create Notes:** Users can create new notes, providing a title, content, and category.
+- **Read Notes:** View a list of all their created notes on the dashboard.
+- **Update Notes:** Edit the title, content, and category of their existing notes.
+- **Delete Notes:** Permanently remove notes they no longer need.
+
+### 3. Productivity
+- **Search:** Find specific notes by searching through titles and content.
+- **Filter:** Filter their notes by category to easily organize and find what they're looking for.
+
+## Admin Features
+
+An administrator has elevated privileges to oversee the entire application and all its users.
+
+### 1. Authentication
+- **Login:** Log in using special admin credentials.
+- **Logout:** Securely log out from the admin panel.
+
+### 2. Global Oversight
+- **View All Users:** Access a list of all registered users in the system.
+- **View All Notes:** View all notes created by every user in the application.
+- **(Implied) User Management:** Admins have the capability to manage users, which could include viewing details or removing users.
+
+### 3. Analytics Dashboard
+- **View Statistics:** Access a dashboard with key statistics, such as the total number of registered users and the total number of notes created across the platform.
+
+### 4. Profile Management
+- **Admin Profile:** View and manage their own admin profile information.
+
 
 ## Project Structure
 
@@ -60,38 +106,6 @@ notes-app-backend/
     npm run dev
     ```
 
-## API Endpoints
-
-### Authentication
-
--   **`POST /auth/register`**
-    -   Registers a new user.
-    -   **Request Body:** `{ "username": "testuser", "password": "password123" }`
-    -   **Response:** `{ "message": "User registered successfully" }`
-
--   **`POST /auth/login`**
-    -   Logs in an existing user.
-    -   **Request Body:** `{ "username": "testuser", "password": "password123" }`
-    -   **Response:** `{ "token": "your_jwt_token" }`
-
-### Notes (Requires Authentication)
-
-All notes endpoints require a valid JWT in the `Authorization` header: `Authorization: Bearer <token>`
-
--   **`GET /notes`**
-    -   Fetches all notes for the authenticated user.
-
--   **`POST /notes`**
-    -   Creates a new note.
-    -   **Request Body:** `{ "title": "New Note", "content": "This is a new note." }`
-
--   **`PUT /notes/:id`**
-    -   Updates an existing note by its ID.
-    -   **Request Body:** `{ "title": "Updated Title", "content": "Updated content." }`
-
--   **`DELETE /notes/:id`**
-    -   Deletes a note by its ID.
-
 ## Database Schema
 
 ### users table
@@ -106,4 +120,6 @@ All notes endpoints require a valid JWT in the `Authorization` header: `Authoriz
 -   `user_id` (INT, FOREIGN KEY REFERENCES users(id))
 -   `title` (VARCHAR, NOT NULL)
 -   `content` (TEXT, NOT NULL)
--   `created_at` (TIMESTAMP, DEFAULT CURRENT_TIMESTAMP) 
+-   `created_at` (TIMESTAMP, DEFAULT CURRENT_TIMESTAMP)
+
+
